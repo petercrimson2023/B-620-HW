@@ -2,7 +2,11 @@
 title: "HW1-620"
 author: "Bulun Te"
 date: "2024-01-27"
-output: html_document
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    keep_md: true
 ---
 
 ```{r setup, include=FALSE}
@@ -30,11 +34,13 @@ The data is collected through screen time usage monitored by personal iphone, in
 
 ## (d)
 
-```{r}
+```{r,echo=FALSE}
 
 library(tidyverse)
 library(ggplot2)
 library(patchwork)
+library(knitr)
+library(kableExtra)
 Sys.setlocale("LC_TIME", "en_US.UTF-8")
 
 data <- read.csv("BulunTe_IphoneMonitor.csv", header = TRUE)
@@ -50,8 +56,6 @@ data$semster = (data$Date > date("0024-01-09")) %>% as.numeric()
 
 data$semster_weekday = data$semster * data$weekday
 
-
-data %>% View()
 ```
 
 
@@ -59,7 +63,7 @@ data %>% View()
 
 ## (a)
 
-```{r}
+```{r,fig.width=10, fig.height=8,echo=FALSE}
 
 # drawing the time series picture of total screen time, Social.ST.min, proportion, Pickups and duration_per_use
 
@@ -80,7 +84,7 @@ g3 = ggplot(data, aes(x = Date, y = proportion)) +
   geom_line() + 
   geom_point() + 
   geom_smooth(method = "gam", se = TRUE) + 
-  labs(title = "Proportion of Socializing Screen Time vs. Date", x = "Date", y = "Proportion of Socializing Screen Time") + theme(plot.title = element_text(hjust = 0.5))
+  labs(title = "Proportion of Social ST vs. Date", x = "Date", y = "Proportion of Social ST") + theme(plot.title = element_text(hjust = 0.5))
 
 g4 = ggplot(data, aes(x = Date, y = Pickups)) +
   geom_line() + 
@@ -94,7 +98,7 @@ g5 = ggplot(data, aes(x = Date, y = duration_per_use)) +
   geom_smooth(method = "gam", se = TRUE) + 
   labs(title = "Duration per Use vs. Date", x = "Date", y = "Duration per Use (min)") + theme(plot.title = element_text(hjust = 0.5))
 
-g1 + g2 + g3 + g4 + g5 + plot_layout(ncol = 2)
+g1 + g2 + g3 + g4 + g5 + plot_layout(ncol = 3,heights = c(1, 1,1))
 
 ```
 
@@ -112,15 +116,15 @@ g1 + g2 + g3 + g4 + g5 + plot_layout(ncol = 2)
 
 
 
-```{r}
+```{r,echo=FALSE}
 
 # making pairwise plot of five vairables
 
-#library(GGally)
+library(GGally)
 
 data_temp = data %>% select(Total.ST.min, Social.ST.min, proportion, Pickups, duration_per_use)
 
-GGally::ggpairs(data_temp, lower = list(continuous = wrap("points", alpha = 0.3, size = 2.5)), axisLabels = "none")
+ggpairs(data_temp, lower = list(continuous = wrap("points", alpha = 0.3, size = 2.5)), axisLabels = "none")
 
 ```
 
@@ -129,9 +133,123 @@ GGally::ggpairs(data_temp, lower = list(continuous = wrap("points", alpha = 0.3,
 
 From the scatter plot, it tells that:
 
-1. The total screen time and socializing screen time are highly correlated, which is reasonable since socializing screen time is a part of total screen time.
+1. The total screen time and socializing screen time have highest correlation, which is reasonable since socializing screen time is a part of total screen time.
 
 2.Social Screet time and pickups are also very correlated, indicating that most of the pickups might comes from socializing applications.
 
 3. The distributions of Total.ST.min, Social.ST.min, proportion and Pickups are all right skewed.
 
+
+
+## (c)
+
+Occupation Time Curve for five time variables
+
+
+```{r,fig.width=10, fig.height=8,echo=FALSE}
+
+# making occupation time curve for five time variables
+
+# Total Screen Time
+c = seq(0,max(data$Total.ST.min)+1,max(data$Total.ST.min)/100)
+st = sapply(c,function(x){return(sum(data$Total.ST.min >= x))})/length(data$Total.ST.min)
+temp=data.frame(c,st)
+
+g1 = ggplot(temp, aes(x = c, y=st)) + 
+  geom_point(size = 1 )+
+  geom_smooth(method = "gam", se = FALSE)+
+  labs(title = "Occupation Time Curve for Total Screen Time", x = "Total Screen Time (min)", y = "Occupation Time Curve") + theme(plot.title = element_text(hjust = 0.5))
+
+
+
+# Total social screen time
+
+c = seq(0,max(data$Social.ST.min)+1,max(data$Social.ST.min)/100)
+st = sapply(c,function(x){return(sum(data$Social.ST.min >= x))})/length(data$Social.ST.min)
+temp=data.frame(c,st)
+
+g2 = ggplot(temp, aes(x = c, y=st)) + 
+  geom_point(size = 1)+
+  geom_smooth(method = "gam", se = TRUE)+
+  labs(title = "Occupation Time Curve for Social Screen Time", x = "Social Screen Time (min)", y = "Occupation Time Curve") + theme(plot.title = element_text(hjust = 0.5))
+
+# Proportion
+
+c = seq(0,max(data$proportion)+1,max(data$proportion)/100)
+st = sapply(c,function(x){return(sum(data$proportion >= x))})/length(data$proportion)
+temp=data.frame(c,st)
+
+g3 = ggplot(temp, aes(x = c, y=st)) + 
+  geom_point(size = 1)+
+  geom_smooth(method = "gam", se = TRUE)+
+  labs(title = "Occupation Time Curve for Proportion", x = "Proportion", y = "Occupation Time Curve") + theme(plot.title = element_text(hjust = 0.5))
+
+# Pickups
+
+c = seq(0,max(data$Pickups)+1,max(data$Pickups)/100)
+st = sapply(c,function(x){return(sum(data$Pickups >= x))})/length(data$Pickups)
+temp=data.frame(c,st)
+
+g4 = ggplot(temp, aes(x = c, y=st)) + 
+  geom_point(size = 1)+
+  geom_smooth(method = "gam", se = TRUE)+
+  labs(title = "Occupation Time Curve for Pickups", x = "Pickups", y = "Occupation Time Curve") + theme(plot.title = element_text(hjust = 0.5))
+
+
+# Duration per use
+
+c = seq(0,max(data$duration_per_use)+1,max(data$duration_per_use)/100)
+st = sapply(c,function(x){return(sum(data$duration_per_use >= x))})/length(data$duration_per_use)
+temp=data.frame(c,st)
+
+g5 = ggplot(temp, aes(x = c, y=st)) + 
+  geom_point(size = 1)+
+  geom_smooth(method = "gam", se = TRUE)+
+  labs(title = "Occupation Time Curve for Duration per Use", x = "Duration per Use (min)", y = "Occupation Time Curve") + theme(plot.title = element_text(hjust = 0.5))
+
+g1+g2+g3+g4+g5+plot_layout(ncol = 3)
+
+
+```
+
+
+### Comment:
+
+From the occupation time plots of Total Screen time, total social screen time, and pickups, the individual`s pattern on screen time usage and time spent on socializing applications are relatively scattered.
+
+The occupation time curve of proportion and duration per use are more concentrated.
+
+## (d)
+
+```{r,echo=FALSE,fig.width=10, fig.height=8}
+
+# Calculating ACF using acf() for five time series
+
+par(mfrow=c(3,2))
+acf(data$Total.ST.min, main = "ACF of Total Screen Time")
+acf(data$Social.ST.min, main = "ACF of Social Screen Time")
+acf(data$proportion, main = "ACF of Proportion")
+acf(data$Pickups, main = "ACF of Pickups")
+acf(data$duration_per_use, main = "ACF of Duration per Use")
+
+# Seizinig acf values and using kable to display for five variables
+
+acf_total = (acf(data$Total.ST.min, plot = FALSE)$acf[1:10]) %>% round(.,4)
+acf_social = (acf(data$Social.ST.min, plot = FALSE)$acf[1:10]) %>% round(.,4)
+acf_proportion = (acf(data$proportion, plot = FALSE)$acf[1:10]) %>% round(.,4)
+acf_pickups = (acf(data$Pickups, plot = FALSE)$acf[1:10]) %>% round(.,4)
+acf_duration = (acf(data$duration_per_use, plot = FALSE)$acf[1:10]) %>% round(.,4)
+
+acf_table = data.frame(lag=0:9,acf_total,acf_social,acf_proportion,acf_pickups,acf_duration)
+
+
+kable(acf_table, caption = "ACF values for five variables", format = "latex", booktabs = TRUE) %>%
+  kable_styling(latex_options = c("striped", "hold_position"))
+
+
+```
+
+
+### Comment:
+
+From the autocorrelation plots, only significant spike displayed at lag 0 and all other lags are within the 95% confidence interval for all five variables. This indicates that there is no significant auto correlations at any lag for those series at siginificancy level of 5%.
