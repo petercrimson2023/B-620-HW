@@ -1,0 +1,51 @@
+---
+title: "HW1-620"
+author: "Bulun Te"
+date: "2024-01-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Problem 1
+
+## (a)
+
+The collection of the data is aim at understanding individual behavior using screen time of mobile device. One kind of potential interest is the relationship between porportion of time used in socializing applications with regard to total screen time and the number of total pickups.
+
+Regarding the question, there are some literature papers indicating that the number of pickups may be related in a indirect way to the time spent on socializing applications. 
+For example, Sun et al. (2022) investigates the underlying connections between adolescents' mobile phone addiction and psychological factors like social anxiety and impulsivity. The findings suggest a complex interplay where a "grades-ranking-first" mentality, combined with social anxiety, drives increased mobile phone usage.Anna et al (2021) finds a significant and positive correlation between social anxiety and smartphone addiction, indicating that social anxiety might be a contributing factor to increased smartphone usage.
+
+Based on past research, we can hypothesize that the number of pickups might be correlated with the proportion of time spent on socializing applications in an indirect way which might be able to be modelled using statistical tools.
+
+## (b) 
+
+?
+
+## (c)
+
+The data is collected through screen time usage monitored by personal iphone, including total screen time of a day, total time spent on socializing applications, the number of pickup times in day and the fisrt time to pickup in a day. The data is collected from 12/31/2023 to 1/26/2024 with 27 data points. The data is collected by the iphone itself and the data is collected from the iphone user. 
+
+## (d)
+
+```{r}
+
+library(tidyverse)
+library(ggplot2)
+
+data <- read.csv("BulunTe_IphoneMonitor.csv", header = TRUE)
+
+data = data %>% mutate(proportion = Social.ST.min/Total.ST.min,
+                       duration_per_use = Total.ST.min/Pickups)
+
+data$Date = as.Date(data$Date,format="%m/%d/%Y")
+
+data$weekday = (weekdays(data$Date)  %in% c( "Monday", "Tuesday", "Wednesday", "Thursday", "Friday")) %>% as.numeric() 
+
+data$semster = (data$Date > date("0024-01-09")) %>% as.numeric()
+
+
+data
+```
