@@ -327,4 +327,13 @@ The number of bins is set to 30, which correspond to 30 minutes per bin. Typical
 
 # Problem 4
 
+## (a)
 
+
+```{r}
+
+possion_model = glm(Pickups~-1+log(Total.ST.min),data=data,family=poisson())
+
+summary(possion_model)
+
+```
