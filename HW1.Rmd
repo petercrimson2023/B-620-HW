@@ -34,7 +34,7 @@ The data is collected through screen time usage monitored by personal iphone, in
 
 ## (d)
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,message=FALSE}
 
 library(tidyverse)
 library(ggplot2)
@@ -253,3 +253,10 @@ kable(acf_table, caption = "ACF values for five variables", format = "latex", bo
 ### Comment:
 
 From the autocorrelation plots, only significant spike displayed at lag 0 and all other lags are within the 95% confidence interval for all five variables. This indicates that there is no significant auto correlations at any lag for those series at siginificancy level of 5%.
+
+
+# Problem 3
+
+```{r, message=FALSE}
+library("circular")
+```
