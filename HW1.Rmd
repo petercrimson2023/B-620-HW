@@ -3,10 +3,10 @@ title: "HW1-620"
 author: "Bulun Te"
 date: "2024-01-27"
 output:
-  pdf_document:
-    latex_engine: xelatex
   html_document:
     keep_md: true
+  pdf_document:
+    latex_engine: xelatex
 ---
 
 ```{r setup, include=FALSE}
@@ -98,7 +98,7 @@ g5 = ggplot(data, aes(x = Date, y = duration_per_use)) +
   geom_smooth(method = "gam", se = TRUE) + 
   labs(title = "Duration per Use vs. Date", x = "Date", y = "Duration per Use (min)") + theme(plot.title = element_text(hjust = 0.5))
 
-g1 + g2 + g3 + g4 + g5 + plot_layout(ncol = 3,heights = c(1, 1,1))
+g1 + g2 + g3 + g4 + g5 + plot_layout(ncol = 3,heights = c(1,1,1))
 
 ```
 
@@ -260,3 +260,71 @@ From the autocorrelation plots, only significant spike displayed at lag 0 and al
 ```{r, message=FALSE}
 library("circular")
 ```
+
+## (a) (b)
+
+```{r,echo=FALSE,fig.width=10, fig.height=8,message=FALSE}
+
+temp = data$Pickup.1st %>% as.POSIXct(,format="%H:%M")
+
+data$Pickup.1st.angular = (hour(temp)*60+minute(temp))/(24*60)*360
+
+circle_pickup_1st = circular(data$Pickup.1st.angular, units = "degrees", template = "clock24") %>% plot(,col="blue", main = "Circular Plot of Pickup.1st")
+
+circle_pickup_1st
+
+
+
+
+```
+
+### Comment
+
+From the clock, the plot shows that most of the first pickup time is concentrated in 7am-8am where at some days, first pickup time of the mobile phone might falls in 12am-1am. This indicates that the individual might be a morning person and he/she might have a regular schedule of waking up at 7am-8am and sometimes staying up late at night.
+
+## (c)
+
+```{r,echo=FALSE,fig.width=10, fig.height=14,message=FALSE}
+
+circular(data$Pickup.1st.angular, units = "degrees", template = "clock24") %>% 
+  plot(.,
+     stack=TRUE, 
+     bins=30,
+     col="red", 
+     main = "HIstogram Plot Circular Plot of Pickup.1st")
+
+# fisrt.pickup.den =circular(data$Pickup.1st.angular, units = "degrees", template = "clock24") %>%  density(, bw = 40)
+# 
+# fisrt.pickup.den$y = fisrt.pickup.den$y/5.5
+# 
+# max_density <- max(fisrt.pickup.den$y)
+
+# width <- 10
+# height <- 20
+# res <- 300  # Resolution in pixels per inch
+# 
+# # Open a graphics device
+# png("density_plot.png", width = width*res, height = height*res, res = res)
+# 
+# par(mar=c(5,4,4,2) + 0.1)
+
+# plot(fisrt.pickup.den, 
+#      main = "Density Plot of Pickup.1st", 
+#      xlab = "Pickup.1st", 
+#      ylab = "Density",
+#      col="red",
+#      ylim = c(0, max_density * 1.5))
+# 
+# dev.off()
+
+
+```
+
+### Comment
+
+The number of bins is set to 30, which correspond to 30 minutes per bin. Typically, people divide their daily routines into 30-minute increments.
+
+
+# Problem 4
+
+
