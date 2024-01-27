@@ -34,6 +34,8 @@ The data is collected through screen time usage monitored by personal iphone, in
 
 library(tidyverse)
 library(ggplot2)
+library(patchwork)
+Sys.setlocale("LC_TIME", "en_US.UTF-8")
 
 data <- read.csv("BulunTe_IphoneMonitor.csv", header = TRUE)
 
@@ -46,6 +48,90 @@ data$weekday = (weekdays(data$Date)  %in% c( "Monday", "Tuesday", "Wednesday", "
 
 data$semster = (data$Date > date("0024-01-09")) %>% as.numeric()
 
+data$semster_weekday = data$semster * data$weekday
 
-data
+
+data %>% View()
 ```
+
+
+# Problem 2
+
+## (a)
+
+```{r}
+
+# drawing the time series picture of total screen time, Social.ST.min, proportion, Pickups and duration_per_use
+
+g1 = ggplot(data, aes(x = Date, y = Total.ST.min)) + 
+  geom_line() + 
+  geom_point() + 
+  geom_smooth(method = "gam", se = TRUE) + 
+  labs(title = "Total Screen Time vs. Date", x = "Date", y = "Total Screen Time (min)") + theme(plot.title = element_text(hjust = 0.5))
+
+
+g2 = ggplot(data, aes(x = Date, y = Social.ST.min)) +
+  geom_line() + 
+  geom_point() + 
+  geom_smooth(method = "gam", se = TRUE) + 
+  labs(title = "Socializing Screen Time vs. Date", x = "Date", y = "Socializing Screen Time (min)") + theme(plot.title = element_text(hjust = 0.5))
+
+g3 = ggplot(data, aes(x = Date, y = proportion)) +
+  geom_line() + 
+  geom_point() + 
+  geom_smooth(method = "gam", se = TRUE) + 
+  labs(title = "Proportion of Socializing Screen Time vs. Date", x = "Date", y = "Proportion of Socializing Screen Time") + theme(plot.title = element_text(hjust = 0.5))
+
+g4 = ggplot(data, aes(x = Date, y = Pickups)) +
+  geom_line() + 
+  geom_point() + 
+  geom_smooth(method = "gam", se = TRUE) + 
+  labs(title = "Number of Pickups vs. Date", x = "Date", y = "Number of Pickups") + theme(plot.title = element_text(hjust = 0.5))
+
+g5 = ggplot(data, aes(x = Date, y = duration_per_use)) +
+  geom_line() + 
+  geom_point() + 
+  geom_smooth(method = "gam", se = TRUE) + 
+  labs(title = "Duration per Use vs. Date", x = "Date", y = "Duration per Use (min)") + theme(plot.title = element_text(hjust = 0.5))
+
+g1 + g2 + g3 + g4 + g5 + plot_layout(ncol = 2)
+
+```
+
+
+### Comment: 
+
+1. From the plot we could see that, both the total screen time, pick up times, duration per use and total socializing screen time are increasing over time.
+
+2. The Duration per Use vs. Date plot shows  with some spikes that could be outliers or days of particularly long usage sessions.
+
+3. After generalized additive smoothing, unlike the others, this metric fluctuates more without a clear trend, as indicated by the linear model trend line.
+
+
+## (b)
+
+
+
+```{r}
+
+# making pairwise plot of five vairables
+
+#library(GGally)
+
+data_temp = data %>% select(Total.ST.min, Social.ST.min, proportion, Pickups, duration_per_use)
+
+GGally::ggpairs(data_temp, lower = list(continuous = wrap("points", alpha = 0.3, size = 2.5)), axisLabels = "none")
+
+```
+
+
+### Comment:
+
+From the scatter plot, it tells that:
+
+1. The total screen time and socializing screen time are highly correlated, which is reasonable since socializing screen time is a part of total screen time.
+
+2.Social Screet time and pickups are also very correlated, indicating that most of the pickups might comes from socializing applications.
+
+3. The distributions of Total.ST.min, Social.ST.min, proportion and Pickups are all right skewed.
+
