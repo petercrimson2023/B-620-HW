@@ -52,9 +52,9 @@ data$Date = as.Date(data$Date,format="%m/%d/%Y")
 
 data$weekday = (weekdays(data$Date)  %in% c( "Monday", "Tuesday", "Wednesday", "Thursday", "Friday")) %>% as.numeric() 
 
-data$semster = (data$Date > date("0024-01-09")) %>% as.numeric()
+data$semester = (data$Date > date("0024-01-09")) %>% as.numeric()
 
-data$semster_weekday = data$semster * data$weekday
+data$semester_weekday = data$semester * data$weekday
 
 ```
 
@@ -329,11 +329,47 @@ The number of bins is set to 30, which correspond to 30 minutes per bin. Typical
 
 ## (a)
 
+the total screen time $S(t)$ acts as a scaling factor in the Poisson distribution: $\lambda \times S(t)$. This product, $\lambda \times S(t)$, represents the adjusted expected number of pickups for each day, accounting for the varying time window of opportunity.
+
+This adjustment is necessary because the probability of a pickup is assumed to be independent and constant throughout the screen time period. With varying screen times, simply using the fixed rate $\lambda$ wouldn't accurately capture the daily differences in pickup opportunities. The factor $S(t)$ incorporates this variability, resulting in a time-sensitive expected number of pickups that reflects the reality of fluctuating screen time.
+
+
+## (b)
 
 ```{r}
 
-possion_model = glm(Pickups~-1+log(Total.ST.min),data=data,family=poisson())
+possion_model_offset = glm(Pickups~offset(log(Total.ST.min)),data=data,family=poisson(link="log"))
 
-summary(possion_model)
+summary(possion_model_offset)
 
 ```
+
+
+## (c)
+
+```{r}
+
+glm_loglink_offset = glm(Pickups~ weekday+semester+offset(log(Total.ST.min)),data=data,family=poisson(link="log"))
+
+summary(glm_loglink_offset)
+
+```
+
+### (c.1)
+
+From the model, it tells that, at the significance level of 5%, the coefficient of weekday is significuanlty (p < 0.0001) different from 0. This indicates that the number of pickups is significantly different between weekdays and weekends. Adjusting for the total screen time and the semester, the expected number of pickups is $e^{0.45003}=1.5684$ times higher on weekdays than on weekends, which is understandable because more emails and messages are received during weekdays than weekends.
+
+
+### (c.2)
+
+
+From the model, it tells that, at the significance level of 5%, the coefficient of semester is significuanlty (p < 0.0001) different from 0. This indicates that the number of pickups is significantly different between the semesters and vacation. Adjusting for the total screen time and the weekday, the expected number of pickups is $e^{-0.34968}=0.7049$ times lower in the semester than in the winter vacation.
+
+
+
+# Problem 5
+
+
+
+
+
