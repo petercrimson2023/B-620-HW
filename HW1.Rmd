@@ -357,13 +357,13 @@ summary(glm_loglink_offset)
 
 ### (c.1)
 
-From the model, it tells that, at the significance level of 5%, the coefficient of weekday is significuanlty (p < 0.0001) different from 0. This indicates that the number of pickups is significantly different between weekdays and weekends. Adjusting for the total screen time and the semester, the expected number of pickups is $e^{0.45003}=1.5684$ times higher on weekdays than on weekends, which is understandable because more emails and messages are received during weekdays than weekends.
+From the model, it tells that, at the significance level of 5%, the coefficient of weekday is significuanlty (p < 0.0001) different from 0. This indicates that the number of pickups is significantly different between weekdays and weekends. Adjusting for the total screen time and the semester, the expected number of pickups is $e^{0.40294}=1.4962$ times higher on weekdays than on weekends, which is understandable because more emails and messages are received during weekdays than weekends.
 
 
 ### (c.2)
 
 
-From the model, it tells that, at the significance level of 5%, the coefficient of semester is significuanlty (p < 0.0001) different from 0. This indicates that the number of pickups is significantly different between the semesters and vacation. Adjusting for the total screen time and the weekday, the expected number of pickups is $e^{-0.34968}=0.7049$ times lower in the semester than in the winter vacation.
+From the model, it tells that, at the significance level of 5%, the coefficient of semester is significuanlty (p < 0.0001) different from 0. This indicates that the number of pickups is significantly different between the semesters and vacation. Adjusting for the total screen time and the weekday, the expected number of pickups is $e^{-0.23399}=0.7914$ times lower in the semester than in the winter vacation.
 
 
 
