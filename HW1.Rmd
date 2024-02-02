@@ -3,10 +3,10 @@ title: "HW1-620"
 author: "Bulun Te"
 date: "2024-01-27"
 output:
-  html_document:
-    keep_md: true
   pdf_document:
     latex_engine: xelatex
+  html_document:
+    keep_md: true
 ---
 
 ```{r setup, include=FALSE}
@@ -63,7 +63,7 @@ data$semester_weekday = data$semester * data$weekday
 
 ## (a)
 
-```{r,fig.width=10, fig.height=8,echo=FALSE}
+```{r,fig.width=10, fig.height=8,echo=FALSE,message=FALSE}
 
 # drawing the time series picture of total screen time, Social.ST.min, proportion, Pickups and duration_per_use
 
@@ -116,7 +116,7 @@ g1 + g2 + g3 + g4 + g5 + plot_layout(ncol = 3,heights = c(1,1,1))
 
 
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,message=FALSE}
 
 # making pairwise plot of five vairables
 
@@ -146,7 +146,7 @@ From the scatter plot, it tells that:
 Occupation Time Curve for five time variables
 
 
-```{r,fig.width=10, fig.height=8,echo=FALSE}
+```{r,fig.width=10, fig.height=8,echo=FALSE,message=FALSE}
 
 # making occupation time curve for five time variables
 
@@ -221,7 +221,7 @@ The occupation time curve of proportion and duration per use are more concentrat
 
 ## (d)
 
-```{r,echo=FALSE,fig.width=10, fig.height=8}
+```{r,echo=FALSE,fig.width=10, fig.height=8,message=FALSE}
 
 # Calculating ACF using acf() for five time series
 
@@ -257,7 +257,7 @@ From the autocorrelation plots, only significant spike displayed at lag 0 and al
 
 # Problem 3
 
-```{r, message=FALSE}
+```{r, message=FALSE,echo=FALSE}
 library("circular")
 ```
 
@@ -384,7 +384,7 @@ mle_estimate
 ## (b)
 
 
-```{r}
+```{r,warning=FALSE}
 
 mu = mle_estimate$mu
 
