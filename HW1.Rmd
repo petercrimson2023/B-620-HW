@@ -370,6 +370,30 @@ From the model, it tells that, at the significance level of 5%, the coefficient 
 # Problem 5
 
 
+## (a)
+
+```{r}
 
 
+mle_estimate = mle.vonmises(data$Pickup.1st.angular, bias = TRUE)
+
+mle_estimate
+
+```
+
+## (b)
+
+
+```{r}
+
+mu = mle_estimate$mu
+
+kappa = mle_estimate$kappa
+
+# The proabbility that first pickup time is later than 8:30 am
+# calculating with pvonmises function as follow:
+
+1-pvonmises(8.5, mu, kappa)
+
+```
 
