@@ -26,7 +26,7 @@ Based on past research, we can hypothesize that the number of pickups might be c
 
 ## (b) 
 
-?
+Informed consent form is a document that is used to inform the participant about the nature of the research project, including the risks and benefits of participation, so that the participant can make an informed decision about whether to participate. The document outlines the study's specific aims, methodology, potential benefits and risks associated with participation, participant autonomy to withdraw at any juncture, data confidentiality measures, data collection strategies, and principal investigator contact information. The informed consent form should be written in a plain language that is understandable to the participant,  with ample opportunity for clarification through participant inquiry prior to enrollment. The informed consent form should be signed and dated by the participant, and a copy of the form should be given to the participant for their records.
 
 ## (c)
 
@@ -50,7 +50,16 @@ data = data %>% mutate(proportion = Social.ST.min/Total.ST.min,
 
 data$Date = as.Date(data$Date,format="%m/%d/%Y")
 
-data$weekday = (weekdays(data$Date)  %in% c( "Monday", "Tuesday", "Wednesday", "Thursday", "Friday")) %>% as.numeric() 
+
+```
+
+```{r}
+
+data$weekday = (weekdays(data$Date)  %in% c( "Monday", 
+                                             "Tuesday", 
+                                             "Wednesday", 
+                                             "Thursday", 
+                                             "Friday")) %>% as.numeric() 
 
 data$semester = (data$Date > date("0024-01-09")) %>% as.numeric()
 
@@ -263,7 +272,7 @@ library("circular")
 
 ## (a) (b)
 
-```{r,echo=FALSE,fig.width=10, fig.height=8,message=FALSE}
+```{r,fig.width=10, fig.height=8,message=FALSE}
 
 temp = data$Pickup.1st %>% as.POSIXct(,format="%H:%M")
 
@@ -344,6 +353,8 @@ summary(possion_model_offset)
 
 ```
 
+$$\log(\lambda_i) = -0.55622 + \log(\text{Total.ST.min}_i)+\epsilon_i$$
+
 
 ## (c)
 
@@ -354,6 +365,8 @@ glm_loglink_offset = glm(Pickups~ weekday+semester+offset(log(Total.ST.min)),dat
 summary(glm_loglink_offset)
 
 ```
+
+$$\log(\lambda_i) = -0.68991 + 0.40294 \cdot \text{weekday}_i - 0.23399 \cdot \text{semester}_i + \log(\text{Total.ST.min}_i)+\epsilon_i$$
 
 ### (c.1)
 
@@ -372,8 +385,7 @@ From the model, it tells that, at the significance level of 5%, the coefficient 
 
 ## (a)
 
-```{r}
-
+```{r,warning=FALSE}
 
 mle_estimate = mle.vonmises(data$Pickup.1st.angular, bias = TRUE)
 
@@ -393,7 +405,19 @@ kappa = mle_estimate$kappa
 # The proabbility that first pickup time is later than 8:30 am
 # calculating with pvonmises function as follow:
 
-1-pvonmises(8.5, mu, kappa)
+ cat("The proabbility that first pickup time is later than 8:30 am is", 1-pvonmises(8.5, mu, kappa))
+# 1-pvonmises(8.5, mu, kappa) 
+
+
 
 ```
+
+
+
+# Bibliography
+
+Annoni, A. M., Petrocchi, S., Camerini, A.-L., & Marciano, L. (2021). The Relationship between Social Anxiety, Smartphone Use, Dispositional Trust, and Problematic Smartphone Use: A Moderated Mediation Model. International Journal of Environmental Research and Public Health, 18(5), 2452. https://doi.org/10.3390/ijerph18052452
+
+
+Sun, Z., Zhou, Y., Zhang, Y., Gui, B., & Liu, Z. (2022). Exploring Deeper Causes Linking Adolescents’ Mental Disorders to Mobile Phone Use Problems: Grounded Theory Approach. JMIR Formative Research, 6(2), e31089. https://doi.org/10.2196/31089
 
