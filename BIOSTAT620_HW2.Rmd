@@ -110,10 +110,19 @@ The reasons that cause only the coefficient of `semester` to be significant in t
 3. As the Social Screen time and total screen time all increase in the semster, there might be multicollinearity between the semester and lag 1 of the screen times.
 
 
+### (2c)
+
+```{r}
+
+library(car)
+hypothesis <- c("eq1_semester = 0", "eq2_semester = 0")
+wald_test <- linearHypothesis(fit_2a, hypothesis)
+wald_test
+
+```
 
 
-
-
+The test yielded an F-statistic of 2.5414 with a corresponding p-value of 0.09026. At the significance level of 0.05, we fail to reject the null hypothesis that the coefficients of the `semester` variable in both equations are jointly equal to zero. This indicates that the data doesn`t have sufficient evidence to confirm semester has a significant effect on the screen times.
 
 
 
