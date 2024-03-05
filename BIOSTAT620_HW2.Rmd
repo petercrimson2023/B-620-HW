@@ -1,0 +1,93 @@
+---
+title: "BIOSTAT620_HW2"
+author: "Bulun Te"
+date: "2024-03-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+
+### 1(a)
+
+B
+
+### 1(b)
+
+C
+
+### 1(c)
+
+AD
+
+### 1(d)
+
+D
+
+### 1(e)
+
+AB
+
+
+## Problem 2
+
+
+```{r,include=FALSE}
+library(tidyverse)
+library(patchwork)
+library(knitr)
+library(kableExtra)
+
+# Setting default language as English
+Sys.setenv(LANGUAGE = "en")
+Sys.setlocale("LC_TIME", "en_US.UTF-8")
+
+data <- read.csv("BulunTe_IphoneMonitor.csv", header = TRUE)
+
+data = data %>% mutate(proportion = Social.ST.min/Total.ST.min,
+                       duration_per_use = Total.ST.min/Pickups)
+
+data$Date = as.Date(data$Date,format="%Y/%m/%d")
+data$weekday = (weekdays(data$Date)  %in% c( "Monday", 
+                                             "Tuesday", 
+                                             "Wednesday", 
+                                             "Thursday", 
+                                             "Friday")) %>% as.numeric() 
+data$semester = (data$Date > date("0024-01-09")) %>% as.numeric()
+data$semester_weekday = data$semester * data$weekday
+
+data = data %>% filter(Date<="2024-01-26")
+
+```
+
+
+```{r}
+
+
+
+
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
