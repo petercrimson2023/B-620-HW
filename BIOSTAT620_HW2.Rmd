@@ -2,7 +2,10 @@
 title: "BIOSTAT620_HW2"
 author: "Bulun Te"
 date: "2024-03-05"
-output: html_document
+output: 
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
 ---
 
 ```{r setup, include=FALSE}
@@ -126,6 +129,47 @@ The test yielded an F-statistic of 2.5414 with a corresponding p-value of 0.0902
 
 
 
+## Problem 3
 
 
+### (a)
+
+
+By randomly assigning participants to either take A drug or take B drug, it ensures that confounders are likely be ditributed equally among the groups. In this way, any confounders have an equal chances of affecting each treatment arms. This means that unobserved confounders in the $\epsilon_i$ term are likely to be independent of the treatment assignment $X_i$. 
+
+Because of random assignment, the treatment variable $X_i$ is independent of other variables that are not observed in the study. In this way, the treatment effect of drugs are independent of the outcome variable.
+
+### (b)
+
+As $X_i$ is coded in {1,-1}, thus, treatment effect for drug a is $\beta_1$ and treatment effect for drug b is $-\beta_1$. 
+
+
+### (c)
+
+$\text{Cov}(Y, X) = \text{Cov}(\beta_0 + \beta_1 X + \varepsilon, X) = \beta_1 \text{Var}(X) +\text{Cov}(\varepsilon, X)= \beta_1 \text{Var}(X)$
+
+Therefore, without adding confounders,
+
+$\hat{\beta}_1 = \frac{\text{Cov}(Y, X)}{\text{Var}(X)}$
+
+After adding confounder Z, as by the randomization, Z is independent with X. Thus, we have
+
+$\text{Cov}(Y, X)= \text{Cov}(\beta_0 + \beta_1 X + \beta_2 Z + \varepsilon, X)= \beta_1 \text{Var}(X) + \beta_2 \text{Cov}(Z, X) + \text{Cov}(\varepsilon, X)=\beta_1 \text{Var}(X) + 0 + 0$
+
+$\hat{\beta}_1 = \frac{\text{Cov}(Y, X)}{\text{Var}(X)}$
+
+Therefore, by adding confounder, the estimate of $\beta_1$ is still unbiased.
+
+
+
+### (d)
+
+$\text{ATE} = \mathbb{E}\left[Y_A - Y_B\right] = \mathbb{E}\left[Y_A\right] - \mathbb{E}\left[Y_B\right]$
+
+As X  is randomized,X is independent with outcome Y. Therefore,
+
+
+$\mathbb{E}\left[Y_A\right] = \mathbb{E}\left[Y | X=1\right] = \beta_0 + \beta_1, \quad \mathbb{E}\left[Y_B\right] = \mathbb{E}\left[Y | X=-1\right] = \beta_0 - \beta_1$
+
+Thus, $\text{ATE} = \mathbb{E}\left[Y_A - Y_B\right] = \mathbb{E}\left[Y_A\right] - \mathbb{E}\left[Y_B\right] = 2\beta_1$
 
