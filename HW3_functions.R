@@ -169,14 +169,11 @@ calculate_smd <- function(data, treat, covariates, group) {
       smd_anon(.x[.data[[treat]] == 1], .x[.data[[treat]] == 0])
     }, .names = "{.col}_smd")) %>%
     pivot_longer(cols = ends_with("_smd"), names_to = "variable", values_to = "smd") %>%
-    mutate(variable = gsub("_smd", "", variable))
+    mutate(variable = gsub("_ssmd", "", variable))
   
   return(smd_data)
 }
 
-
-
-# 绘制 Love Plot 的函数
 plot_love <- function(smd_data, title = "Love Plot: Standardized Mean Differences", 
                       smd_threshold = 0.1, colors = c("red", "blue"), 
                       shapes = c("circle", "triangle")) {
@@ -198,8 +195,31 @@ plot_love <- function(smd_data, title = "Love Plot: Standardized Mean Difference
   return(plot)
 }
 
-
 covariates <- c("hcover", "pcdocs")
 smd_data <- calculate_smd(data_list, treat = "treat", covariates = covariates, group = "match_status")
 love_plot <- plot_love(smd_data)
 print(love_plot)
+
+
+
+
+# 
+# smd_anon(data_list_before %>% filter(treat==1)%>% select(hcover) %>% unlist() ,
+#          data_list_before %>% filter(treat==0)%>% select(hcover) %>% unlist())
+# 
+# 
+# smd_anon(data_list_before %>% filter(treat==1)%>% select(pcdocs) %>% unlist() ,
+#          data_list_before %>% filter(treat==0)%>% select(pcdocs) %>% unlist())
+# 
+# 
+# 
+# smd_anon(data_list_after %>% filter(treat==1)%>% select(hcover) %>% unlist() ,
+#          data_list_after %>% filter(treat==0)%>% select(hcover) %>% unlist())
+# 
+# 
+# smd_anon(data_list_after %>% filter(treat==1)%>% select(pcdocs) %>% unlist() ,
+#          data_list_after %>% filter(treat==0)%>% select(pcdocs) %>% unlist())
+# 
+# 
+
+
