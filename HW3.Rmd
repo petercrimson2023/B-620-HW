@@ -1,0 +1,41 @@
+---
+title: "HW3"
+author: "Bulun Te"
+date: "2024-03-26"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+
+### (c)
+
+By scanning the codes, there are some potnetial improvements detected for conducting federated learning procedures. 
+
+1. Code conciseness: The code for generating results could be written more concisely. This would improve readability and maintainability, making it easier for other developers to understand and work with the codebase.
+
+2. Data exchange efficiency: In the context of ordinary least squares linear regression, federated learning can be carried out with fewer data sharing iterations. By optimizing the data exchange process, the efficiency of the federated learning system can be improved, reducing the amount of data transferred between the central server and participating clients.
+
+3. Scalability enhancements: To improve the scalability of the federated learning system, further optimizations can be made to the front-end modules. This could involve designing a more user-friendly interface, providing clear documentation, and implementing modular components that are easy to understand and integrate. By enhancing the scalability of the front-end, the federated learning system can accommodate a larger number of users and handle increased data loads more effectively
+
+Based on the experience of implemnting federated learning procedure, some general recommendations are provided as follows:
+
+1.Ensure that the federated learning framework protects sensitive data and maintains privacy throughout the learning process, as the data used by the group has shared original data for federated learning procedure.
+
+2.Implement mechanisms to handle client dropouts, communication failures, or other system failures during the federated learning process
+
+3.Enhance the code's usability by providing more user-friendly documentation and instructions.
+
+4.Consider using more descriptive variable names to enhance code readability.
+
+
+
+## Problem 2
+
+
