@@ -24,16 +24,18 @@ data_B = merged_data %>% filter(Treatment != "A") %>% mutate(Treatment = ifelse(
                                                              Exp_Age = exp(0.2*age),
                                                              Age2 = age^2,
                                                              Age_Pickup = age*Pickups,
-                                                             Age_Totscr = age*Tot.Scr.Time,
-                                                             Sex_Totscr = sex*Tot.Scr.Time)
+                                                             Pickups2= Pickups^2,
+                                                             log_Tot_Scr= log(Tot.Scr.Time),
+                                                             sex_Tot_Scr = sex*Tot.Scr.Time,
+                                                             age_Tot_Scr = age*Tot.Scr.Time)
 
 
 covariates_A = c("Pickups","Age_Pickup","sex","Phase")
-psm_A = PSM$new(data_A,"Treatment",covariates_A,"Tot.Scr.Time")
+psm_A = PSM$new(data_A,"Treatment",covariates_A,"Tot.Soc.Time")
 psm_A$psm_analysis()
 
-covariates_B = c("sex","Tot.Soc.Time","Phase")
-psm_B = PSM$new(data_B,"Treatment",covariates_B,"Pickups")
+covariates_B = c("Pickups","sex_Tot_Scr","age_Tot_Scr","Phase")
+psm_B = PSM$new(data_B,"Treatment",covariates_B,"Tot.Soc.Time")
 psm_B$psm_analysis()
 
 

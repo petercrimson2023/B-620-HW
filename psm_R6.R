@@ -79,20 +79,17 @@ PSM = R6Class(
       # Calculate differences
       differences <- treated_outcomes - control_outcomes
       mean_diff <- mean(differences)
-      sd_diff <- sd(differences)
-      n <- length(differences)
-      
-      
       ATE <- mean_diff
-      t_statistic <- mean_diff / (sd_diff / sqrt(n))
-      df <- n - 1
-      p_value <- 2 * (1 - pt(abs(t_statistic), df))
+      t_test_result = t.test(treated_outcomes, control_outcomes)
       
       # Output
       self$ATE_list = list(
         ATE = ATE,
-        t_statistic = t_statistic,
-        p_value = p_value
+        t_statistic = t_test_result$statistic,
+        t_test_method = t_test_result$method,
+        p_value = t_test_result$p.value,
+        confidence_interval = t_test_result$conf.int,
+        df = t_test_result$parameter
       )
     },
     
