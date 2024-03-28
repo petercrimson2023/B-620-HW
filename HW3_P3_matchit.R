@@ -25,13 +25,15 @@ data_B = merged_data %>% filter(Treatment != "A") %>% mutate(Treatment = ifelse(
 
 
 matchit_model_A = matchit(Treatment~sex+Age_Pickup+Phase+Pickups,
-                          data=data_A,method="nearest",
+                          data=data_A,method="nearest",distance="glm",
                           caliper=0.1,ratio=1)
 
 bal.tab(matchit_model_A, data = data_A, un = TRUE)
 matched_data_A <- match.data(matchit_model_A)
 model_A <- lm(Tot.Scr.Time ~ Treatment, data = matched_data_A)
 coef(model_A)[2]
+matched_data_A$distance %>% summary()
+
 # Treatment 
 # -261.8194 
 
@@ -48,7 +50,7 @@ ggplot(matched_data_A, aes(x = distance, fill = factor(Treatment))) +
 
 
 matchit_model_B = matchit(Treatment~sex+Tot.Soc.Time+Phase,
-                          data=data_B,method="nearest",
+                          data=data_B,method="nearest",distance="glm",
                           caliper=0.1,ratio=1)
 
 bal.tab(matchit_model_B, data = data_B, un = TRUE)
@@ -56,6 +58,8 @@ matched_data_B <- match.data(matchit_model_B)
 
 model_B <- lm(Pickups ~ Treatment, data = matched_data_B)
 coef(model_B)[2]
+matched_data_B$distance %>% summary()
+
 
 # Treatment 
 # 40.62353 
