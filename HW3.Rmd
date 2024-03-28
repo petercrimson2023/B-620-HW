@@ -39,3 +39,49 @@ Based on the experience of implemnting federated learning procedure, some genera
 ## Problem 2
 
 
+## Problem 3
+
+
+```{r}
+library(dplyr)
+library(readxl)
+
+sheet1 = read_excel("ScreenTime-hw3Q3.xlsx",sheet=1)
+sheet2 = read_excel("ScreenTime-hw3Q3.xlsx",sheet=2)
+
+sheet1$pseudo_id <- as.character(sheet1$pseudo_id)
+sheet2$pseudo_id <- as.character(sheet2$pseudo_id)
+
+merged_data <- left_join(sheet1, sheet2, by = "pseudo_id")
+
+
+data_A = merged_data %>% filter(Treatment != "B") %>% mutate(Treatment = ifelse(Treatment == "A", 1, 0))
+data_B = merged_data %>% filter(Treatment != "A") %>% mutate(Treatment = ifelse(Treatment == "B", 1, 0))
+
+
+
+
+
+```
+
+
+
+### (a)
+
+# using self written psm functions to claculate psm
+
+```{r}
+
+source("psm_functions.R")
+
+#matched_data = perform_psm(Treatment~sex+age+pets+siblings,data_A)
+
+covariates_A = c("sex","age","pets","siblings","Pickups")
+covariates_A = c("age","Pickups")
+
+matched_data = propensity_score_matching(data_A,"Treatment",covariates_A)
+
+calculate_ATE_manual(matched_data,"Tot.Scr.Time","Treatment")
+
+smd_values = smd(matched_data,"Tot.Scr.Time",covariates_A)
+```
