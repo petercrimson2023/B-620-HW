@@ -1,0 +1,308 @@
+---
+title: "HW4_Part2"
+author: "Bulun Te"
+date: "2024-04-06"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 2
+
+## loading data
+
+```{r}
+
+setwd(here::here())
+library(dplyr)
+library(ggplot2)
+library(readxl)
+
+sheet1 = read_excel("ScreenTime-hw3Q3.xlsx",sheet=1)
+sheet2 = read_excel("ScreenTime-hw3Q3.xlsx",sheet=2)
+
+sheet1$pseudo_id <- as.character(sheet1$pseudo_id)
+sheet2$pseudo_id <- as.character(sheet2$pseudo_id)
+
+merged_data <- left_join(sheet1, sheet2, by = "pseudo_id")
+selected_data <- merged_data %>% filter(Treatment == "B")
+pesudo_id_list = unique(selected_data$pseudo_id)
+
+rbind(merged_data%>%head(),merged_data%>%tail()) %>% knitr::kable()
+
+```
+
+### (a)
+
+```{r}
+
+# Create an empty list to store the model results
+model_results <- list()
+
+# Loop through pseudo_id 1 to 8
+for (id in pesudo_id_list) {
+  # Subset the data for each pseudo_id, create lag-1 variable for Pickups, and create weekday dummy variable
+  subset_data <- merged_data %>%
+    filter(pseudo_id == id) %>%
+    mutate(
+      lag1_Pickups = c(NA, Pickups[-n()]),
+      weekday = ifelse(Day %in% c("Mo", "Tu", "We", "Th", "Fr"), 1, 0),
+      B = ifelse(Phase == "Treatment", 1, 0)
+    )
+  
+  # Fit the Poisson regression model with offset
+  model <- glm(Pickups ~ log(lag1_Pickups) + B + weekday,
+               family = poisson(link = "log"),
+               offset = log(Tot.Scr.Time),
+               data = subset_data)
+  
+  # Store the model results in the list
+  model_results[[id]] <- model
+}
+
+# Create a summary table with estimates and standard errors
+summary_table <- tibble(
+  id = pesudo_id_list,
+  beta0_est = sapply(model_results, function(x) coef(x)[1]),
+  beta0_se = sapply(model_results, function(x) summary(x)$coefficients[1, 2]),
+  beta1_est = sapply(model_results, function(x) coef(x)[2]),
+  beta1_se = sapply(model_results, function(x) summary(x)$coefficients[2, 2]),
+  beta2_est = sapply(model_results, function(x) coef(x)[3]),
+  beta2_se = sapply(model_results, function(x) summary(x)$coefficients[3, 2]),
+  beta3_est = sapply(model_results, function(x) coef(x)[4]),
+  beta3_se = sapply(model_results, function(x) summary(x)$coefficients[4, 2])
+)
+
+# Print the summary table
+summary_table %>% knitr::kable()
+
+
+```
+
+
+### (b)
+
+
+```{r}
+
+
+meta_learning <- function(summary_table) {
+  # Extract the number of users
+  K <- nrow(summary_table)
+  
+  # Compute the weights for each beta coefficient and each user
+  weights_beta0 <- 1 / summary_table$beta0_se^2
+  weights_beta1 <- 1 / summary_table$beta1_se^2
+  weights_beta2 <- 1 / summary_table$beta2_se^2
+  weights_beta3 <- 1 / summary_table$beta3_se^2
+  
+  # Compute the meta-estimate for each beta coefficient
+  beta0_meta <- sum(summary_table$beta0_est * weights_beta0) / sum(weights_beta0)
+  beta1_meta <- sum(summary_table$beta1_est * weights_beta1) / sum(weights_beta1)
+  beta2_meta <- sum(summary_table$beta2_est * weights_beta2) / sum(weights_beta2)
+  beta3_meta <- sum(summary_table$beta3_est * weights_beta3) / sum(weights_beta3)
+  
+  # Compute the variance of the meta-estimate for each beta coefficient
+  beta0_meta_var <- 1 / sum(weights_beta0)
+  beta1_meta_var <- 1 / sum(weights_beta1)
+  beta2_meta_var <- 1 / sum(weights_beta2)
+  beta3_meta_var <- 1 / sum(weights_beta3)
+  
+  # Compute the standard error of the meta-estimate for each beta coefficient
+  beta0_meta_se <- sqrt(beta0_meta_var)
+  beta1_meta_se <- sqrt(beta1_meta_var)
+  beta2_meta_se <- sqrt(beta2_meta_var)
+  beta3_meta_se <- sqrt(beta3_meta_var)
+  
+  meta_summary_table <- tibble(
+    beta0_est = beta0_meta,
+    beta0_se = beta0_meta_se,
+    beta1_est = beta1_meta,
+    beta1_se = beta1_meta_se,
+    beta2_est = beta2_meta,
+    beta2_se = beta2_meta_se,
+    beta3_est = beta3_meta,
+    beta3_se = beta3_meta_se
+  )
+  
+  # Return the meta-learning summary table
+  return(meta_summary_table)
+}
+
+# Use the summary table from the previous code
+meta_results <- meta_learning(summary_table)
+
+# Print the meta-estimates and their standard errors
+meta_results %>% knitr::kable()
+
+```
+
+
+### (c)
+
+testing significany of the Treatment (denoted as B) at level 0.05
+
+```{r}
+
+# Compute the z-statistic for the Treatment effect
+z_stat <- (meta_results$beta2_est - 0) / meta_results$beta2_se
+# Compute the p-value for the Treatment effect
+p_value <- 2 * (1 - pnorm(abs(z_stat)))
+# Print the z-statistic and p-value for the Treatment effect
+print(paste("z-statistic:", z_stat))
+print(paste("p-value:", p_value))
+
+
+
+
+```
+
+Based on the test statistics, under 5% significancy level, we can reject the null hypothesis that the treatment effect is zero.
+
+
+### (d)
+
+`Advantages`:
+
+Flexibility and computational efficiency: Meta-learning is more flexible and computationally easier than federated learning. It can handle nonlinear regression models, such as GLMs and Cox PH model, where closed-form expressions for estimation and inference are not available. In contrast, federated learning may lack flexibility and can be computationally expensive when dealing with nonlinear models that require iterative algorithms for parameter estimation.
+
+
+Minimal data sharing: Meta-learning requires minimal data sharing between local sites and the central server. Only summary statistics (point estimates and their variances or standard errors) need to be shared, regardless of the statistical problem. This is advantageous for privacy and security concerns. In federated learning, the communication between local sites and the central platform can be expensive, especially when iterative updates of summary statistics are required.
+
+
+`Disadvantages`:
+
+Assumption of independent samples: Meta-learning assumes that the samples from different study sites are independent. This assumption may not always hold in practice, and violations of this assumption can lead to biased or incorrect results. Federated learning, on the other hand, does not necessarily require the assumption of independent samples across sites.
+
+
+Assumption of homogeneous target model parameters: Meta-learning assumes that the target model parameters are homogeneous across study sites. However, this assumption may be violated in some situations, leading to biased or suboptimal results. In federated learning, the assumption of model homogeneity is also strong, but it can be relaxed by allowing for site-specific model parameters or by using techniques like model averaging.
+
+
+## Problem 3
+
+### (a)
+
+load and merge the data
+
+```{r}
+sheet1 = read_excel("ScreenTime-hw3Q3.xlsx",sheet=1)
+sheet2 = read_excel("ScreenTime-hw3Q3.xlsx",sheet=2)
+
+sheet1$pseudo_id <- as.character(sheet1$pseudo_id)
+sheet2$pseudo_id <- as.character(sheet2$pseudo_id)
+
+merged_data <- left_join(sheet1, sheet2, by = "pseudo_id")
+
+rbind(merged_data%>%head(),merged_data%>%tail()) %>% knitr::kable()
+
+
+
+```
+```{r}
+
+selected_data_A = merged_data %>% filter(Treatment == "A") %>% mutate(
+  lag1_Pickups = c(NA, Pickups[-n()]),
+  weekday = ifelse(Day %in% c("Mo", "Tu", "We", "Th", "Fr"), 1, 0),
+  A = ifelse(Phase == "Treatment", 1, 0)
+)
+
+model_a <- glm(
+  Pickups ~ log(lag1_Pickups)+A+weekday+sex+age+pets+siblings,
+  family = poisson(link = "log"),
+  offset = log(Tot.Scr.Time),
+  data = selected_data_A
+)
+
+summary(model_a)$coefficients[,c(1,2)] %>% data.frame() -> model_a_summary
+
+
+
+selected_data_B = merged_data %>% filter(Treatment == "B") %>% mutate(
+  lag1_Pickups = c(NA, Pickups[-n()]),
+  weekday = ifelse(Day %in% c("Mo", "Tu", "We", "Th", "Fr"), 1, 0),
+  B = ifelse(Phase == "Treatment", 1, 0)
+)
+
+model_b <- glm(
+  Pickups ~ log(lag1_Pickups)+B+weekday+sex+age+pets+siblings,
+  family = poisson(link = "log"),
+  offset = log(Tot.Scr.Time),
+  data = selected_data_B
+)
+
+summary(model_b)$coefficients[,c(1,2)] %>% data.frame() -> model_b_summary
+
+
+sqrt((1/model_a_summary[2]^2 + 1/model_b_summary[2]^2)^(-1)) -> meta_se
+((model_a_summary[1]/model_a_summary[2]^2+
+    model_b_summary[1]/model_b_summary[2]^2)*meta_se^2) -> meta_est
+
+cbind(meta_est,meta_se) -> meta_summary_table
+
+meta_summary_table = meta_summary_table %>% mutate(
+  z = unlist(meta_est/meta_se),
+  p = 2*(1-pnorm(abs(z)))
+)
+
+meta_summary_table %>% knitr::kable()
+
+
+```
+
+
+### (b)
+
+```{r}
+
+# compute the chisq statistics
+
+chisq_stat <- ((meta_est[3,1] - 0) / meta_se[3,1])^2
+
+# compute the p-value
+p_value <- 1 - pchisq(chisq_stat, df = 1)
+
+# print the chisq statistics and p-value
+
+print(paste("chisq-statistic:", chisq_stat))
+print(paste("p-value:", p_value))
+
+
+
+```
+Based on the meta learning statistics, under 5% significancy level, reject the null hypothesis. The intervention has a significant effect on the daily number of pickups in comparison to the pre-intervention baseline screen activity.
+
+
+
+### (c)
+
+
+```{r}
+
+selected_data_C <- merged_data %>% 
+  filter(Treatment != "P") %>% mutate(
+  lag1_Pickups = c(NA, Pickups[-n()]),
+  weekday = ifelse(Day %in% c("Mo", "Tu", "We", "Th", "Fr"), 1, 0),
+  R = ifelse(Phase == "Treatment", 1, 0)
+)
+
+
+model_c <- glm(
+  Pickups ~ log(lag1_Pickups)+R+weekday+sex+age+pets+siblings,
+  family = poisson(link = "log"),
+  offset = log(Tot.Scr.Time),
+  data = selected_data_C
+)
+
+summary(model_c)$coefficients %>% data.frame() %>% knitr::kable()
+
+```
+
+
+### (d)
+
+Based on the meta learning estimation and centralized model estimation, we could see that the estimation of coefficients and standard error by the meta learning are different from the version of centralized model estimation on all of the covariates. However, the staistical significance of coefficients are consistent between the two methods.
